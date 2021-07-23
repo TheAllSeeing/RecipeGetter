@@ -1,6 +1,7 @@
 from tensorflow import keras
 import requests
 from bs4 import BeautifulSoup as BS
+from model import predict, train_model
 
 
 def get_html(url: str) -> str:
@@ -91,5 +92,8 @@ def get_recipe_json(url: str) -> str:
     json += instructions  # Add instructions. Sadly noi way to properly line-wrap and indent this properly, but a compiler would deal
     json += '"'  # Close instructions quotation
     json += '\n}'  # Closing brace
-
     return json
+
+
+if __name__ == '__main__':
+    print(get_recipe_json('https://www.loveandlemons.com/homemade-pasta-recipe/'))
