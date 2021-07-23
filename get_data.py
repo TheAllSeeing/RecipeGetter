@@ -4,7 +4,7 @@ import numpy as np
 # Prior, Download dataset json from https://eightportions.com/datasets/Recipes/ to dataset.json
 
 JSON_PATH = 'dataset.json'
-DATA_SIZE = 67_000
+DATA_SIZE = 55_000
 
 
 def get_raw_json():
@@ -24,13 +24,13 @@ def get_data_lists():
         if item:  # JSON contains a few empty recipes for some reason. this check the item is not empty.
             instructions += item['directions']
             ingredients += item['ingredients']
-
     # Total size of instructions is 69458
     # Total size of ingredients is 199030
     # I don't really want to try and deal with imbalanced classes in training, so I'll trim them to 67000
     # I could have really done it while getting them from the recipe dictionaries, but in this case it was pretty
     # negligible in time
-    return instructions[:DATA_SIZE], ingredients[:DATA_SIZE]
+
+    return list(set(instructions))[:DATA_SIZE], list(set(ingredients))[:DATA_SIZE]
 
 
 def save_to_tsv(instructions, ingredients):
