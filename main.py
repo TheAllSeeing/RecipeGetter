@@ -2,14 +2,13 @@ from tensorflow import keras
 import requests
 from bs4 import BeautifulSoup as BS
 
-"""
-get_html(url: str) -> str
-
-Takes a webpage url and returns its contents as a string
-"""
-
 
 def get_html(url: str) -> str:
+    """
+    get_html(url: str) -> str
+
+    Takes a webpage url and returns its contents as a string
+    """
     # Probably via an extra package, e.g requests
     return requests.get(url).text
 
@@ -32,34 +31,38 @@ def get_paragraphs(html_page: str) -> str:
 
 def classify(paragraph: str) -> int:
     """
-    Classify a paragraph as components (1), instructions (0) or irrelevant (-1)
+    Classify a paragraph as instructions (1), ingredients (0) or neither (-1)
     """
-    # Implement an ANN model
+    paragraph_class = predict(paragraph, load=False)
+
+    if paragraph_class > 0.85:
+        return 1
+    if paragraph_class < 0.15:
+        return 0
     return -1
 
 
-def get_json(url: str) -> str:
+def get_recipe_json(url: str) -> str:
     """
-    get_json(url: str) -> str
+    get_recipe_json(url: str) -> str
 
     Takes the url to a recipe webpage and extracts a matching json of ingredients list and instructions string.
 
     An example webpage can be found at https://www.loveandlemons.com/homemade-pasta-recipe/
     An example output may look like so:
     {
-        Recipe: [
-            2 slice of bread
+        ingredients: [
+            2 slices of bread
             1 box of butter
-            1 slice yellow cheese
+            1 slice of yellow cheese
         ]
 
-        INSTRUCTIONS: "Spread some butter over one slice of bread.
+        instructions: "Spread some butter over one slice of bread.
             Put the slice of cheese over the butter
             Close the sandwich with the second slice
             Put the sandwich in the toaster and wait 3 minutes
     }
     """
-
     # Extract the relevant paragraphs from the webpage
     inputs = get_paragraphs(get_html(url))
 
@@ -74,13 +77,13 @@ def get_json(url: str) -> str:
         # Add to appropriate variable or ignore if irrelevant
         if paragraph_type == -1:
             continue
-        elif paragraph_type == 0:
-            instructions += '\n' + paragraph
         elif paragraph_type == 1:
+            instructions += '\n' + paragraph
+        elif paragraph_type == 0:
             ingredients.append(paragraph)
 
     # Compose JSON
-    json = "{\n"  # Opening brace
+    json = '{\n'  # Opening brace
     json += "\n\tingredients: ["  # ingredients member, one indentation level
     json += ',\n\t\t'.join(ingredients)  # Ingredient list in the ingredients member, two indentations member
     json += '\n\t]'  # Close off ingredients list (one indentation level)
