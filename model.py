@@ -43,9 +43,9 @@ TOKENIZER = Tokenizer(num_words=VOCABULARY_SIZE, oov_token=OOV_TOKEN)
 MODEL = tf.keras.Sequential([
     tf.keras.layers.Embedding(VOCABULARY_SIZE, EMBEDDING_DIMENSIONS, input_length=MAX_INPUT_LENGTH),
     tf.keras.layers.GlobalAveragePooling1D(),
-    tf.keras.layers.Dense(24, activation='relu'),
-    tf.keras.layers.Dense(32, activation='relu'),
-    tf.keras.layers.Dense(24, activation='relu'),
+    tf.keras.layers.Dense(24, activation='selu'),
+    tf.keras.layers.Dense(32, activation='selu'),
+    tf.keras.layers.Dense(24, activation='selu'),
     tf.keras.layers.Dense(3, activation='softmax')
 ])
 
