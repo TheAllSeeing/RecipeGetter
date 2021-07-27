@@ -86,8 +86,13 @@ def get_recipe_json(url: str) -> str:
             Put the sandwich in the toaster and wait 3 minutes
     }
     """
-    # Extract the relevant paragraphs from the webpage
-    inputs = get_paragraphs(get_html(url))
+    # Extract the relevant paragraphs from the webpage.
+    # Catch ConnectionError (no internet) if it rises and if so give an appropriate message and exit
+    try:
+        inputs = get_paragraphs(get_html(url))
+    except requests.exceptions.ConnectionError:
+        print("Could not retrieve the web page. Please make sure you are connected to the Internet.")
+        return ''
 
     # Iterate over the paragraphs and keep them in appropriate variables
     ingredients = []
