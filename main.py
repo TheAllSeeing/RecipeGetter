@@ -4,6 +4,11 @@ from bs4 import BeautifulSoup as BS
 from typing import List
 
 
+CONFIDENCE_THRESHOLD = 0.97
+"""Minimum model confidence in classification required for a paragraph to go into the threshold. 
+
+    It is assumed the model will be at least a little insecure about irrelevant texts (e.g 'Contact Us')
+"""
 def get_html(url: str) -> str:
     """
     get_html(url: str) -> str
@@ -34,18 +39,21 @@ def get_paragraphs(html_page: str) -> List[str]:
     return trimmed
 
 
-def classify(paragraph: str) -> int:
+def classify(paragraphs: List[str]) -> List[int]:
     """
-    Classify a paragraph as instructions (1), ingredients (0) or neither (-1)
+    :param paragraphs: a paragraph from a recipe page
+    :return: integer classification of the paragraph as instruction (1), ingredient (0) or neither (-1)
     """
-    paragraph_class = predict(paragraph, load=False)
+    predictions = MODEL.predict(preprocess_data(paragraphs))
 
-    if paragraph_class > 0.85:
-        return 1
-    if paragraph_class < 0.15:
-        return 0
-    return -1
+    def prediction_to_code(prediction):
+        if prediction[0] > CONFIDENCE_THRESHOLD:
+            return 0
+        if prediction[1] > CONFIDENCE_THRESHOLD:
+            return 1
+        return -1
 
+    return [prediction_to_code(prediction) for prediction in predictions]
 
 def get_recipe_json(url: str) -> str:
     """
@@ -75,9 +83,9 @@ def get_recipe_json(url: str) -> str:
     ingredients = []
     instructions = ''
 
-    for paragraph in inputs:
+    classifications = classify(inputs)
+    for paragraph_type, paragraph in zip(classifications, inputs):
         # get paragraph type - 1 if it's an ingredient, 0 if it's an instruction and -1 if it is neither
-        paragraph_type = classify(paragraph)
 
         # Add to appropriate variable or ignore if irrelevant
         if paragraph_type == -1:
