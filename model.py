@@ -146,15 +146,17 @@ def test_model_new(model: tf.keras.Sequential):
         '''Set the dough piece onto a countertop or work surface. Fold both short ends in to meet in the center, then fold the
             dough in half to form a rectangle (see photo above).''',
         '2 cups all-purpose flour',
-        '½ teaspoon sea salt'
+        '½ tablespoon extra-virgin olive oil'
     ]
 
+    new_data_labels = [[0, 1, 0], [0, 1, 0], [1, 0, 0], [1, 0, 0]]
     new_data = preprocess_data(new_data)
 
     print("MODEL:")
-    print(model.predict(new_data))
+    print([[round(j, 2) for j in i] for i in model.predict(new_data)])
     print('\nEXPECTED:')
-    print('[1, 1, 0, 0]')
+    print(new_data_labels)
+
 
 def predict(paragraph: str, load: bool=True) -> float:
     if load:
