@@ -85,6 +85,9 @@ def get_recipe_json(url: str) -> str:
             Close the sandwich with the second slice
             Put the sandwich in the toaster and wait 3 minutes
     }
+
+    :param url: the url where the recipe is located
+    :return: a JSON string containing the recipe's ingredient list and instructions
     """
     # Extract the relevant paragraphs from the webpage.
     # Catch ConnectionError (no internet) if it rises and if so give an appropriate message and exit
