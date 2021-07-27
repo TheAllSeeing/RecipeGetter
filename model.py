@@ -46,7 +46,7 @@ MODEL = tf.keras.Sequential([
     tf.keras.layers.Dense(24, activation='relu'),
     tf.keras.layers.Dense(32, activation='relu'),
     tf.keras.layers.Dense(24, activation='relu'),
-    tf.keras.layers.Dense(1, activation='sigmoid')
+    tf.keras.layers.Dense(3, activation='softmax')
 ])
 
 
