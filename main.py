@@ -9,6 +9,8 @@ CONFIDENCE_THRESHOLD = 0.97
 
     It is assumed the model will be at least a little insecure about irrelevant texts (e.g 'Contact Us')
 """
+
+MODEL = load_model()
 def get_html(url: str) -> str:
     """
     get_html(url: str) -> str
