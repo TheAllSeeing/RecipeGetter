@@ -15,10 +15,10 @@ MODEL_PATH = 'Model'
 # ======== MODEL CLASSES ========
 class ModelSave(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs={}):
-        if logs.get('val_accuracy') >= 0.99:
-            print("\nReached 99% on validation tests. Saving to 'model' directory and exiting. ")
+        if logs.get('val_accuracy') >= ACCURACY_THRESHOLD:
+            print(
+                f"\nReached {ACCURACY_THRESHOLD * 100}% on validation tests. Saving to 'model' directory and exiting. ")
             self.model.save(MODEL_PATH)
-            MODEL.save_weights('model_weights')
             self.model.stop_training = True
 # ================
 
