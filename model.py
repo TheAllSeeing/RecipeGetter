@@ -66,7 +66,9 @@ def unpack_tcv(filepath: str) -> Tuple[List[str], List[List[int]]]:
         for item in datafile.readlines():
             cells = item.split('\t')
             raw_data.append(cells[0])
-            labels.append(int(cells[1]))
+            label = cells[1].split(',')
+            label = [int(i) for i in label]
+            labels.append(label)
         return raw_data, labels
 
 
