@@ -1,8 +1,8 @@
-from tensorflow import keras
 import requests
 from bs4 import BeautifulSoup as BS
 from typing import List
 
+from model import load_model, preprocess_data
 
 CONFIDENCE_THRESHOLD = 0.97
 """Minimum model confidence in classification required for a paragraph to go into the threshold. 
@@ -11,6 +11,8 @@ CONFIDENCE_THRESHOLD = 0.97
 """
 
 MODEL = load_model()
+
+
 def get_html(url: str) -> str:
     """
     get_html(url: str) -> str
@@ -59,18 +61,22 @@ def classify(paragraphs: List[str]) -> List[int]:
 
     return [prediction_to_code(prediction) for prediction in predictions]
 
+
 def get_recipe_json(url: str) -> str:
     """
     get_recipe_json(url: str) -> str
 
+
     Takes the url to a recipe webpage and extracts a matching json of ingredients list and instructions string.
 
     An example webpage can be found at https://www.loveandlemons.com/homemade-pasta-recipe/
-    An example output may look like so:
+    An example output may look like so (this one is for a cheese toast):
     {
         ingredients: [
             2 slices of bread
+
             1 box of butter
+
             1 slice of yellow cheese
         ]
 
