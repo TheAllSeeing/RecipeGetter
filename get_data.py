@@ -1,5 +1,5 @@
 import json
-import numpy as np
+from typing import List, Tuple
 
 # Prior, Download dataset json from https://eightportions.com/datasets/Recipes/ to dataset.json
 
@@ -7,16 +7,16 @@ JSON_PATH = 'dataset.json'
 DATA_SIZE = 40_000
 
 
-def get_raw_json():
+def get_raw_json() -> str:
     with open(JSON_PATH) as datafile:
         return datafile.read()
 
 
-def get_json_dict():
+def get_json_dict() -> dict:
     return json.loads(get_raw_json())
 
 
-def get_data_lists():
+def get_manual_data() -> Tuple[List[str], List[str], List[str]]:
     instructions = []
     ingredients = []
     neither = []

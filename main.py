@@ -1,24 +1,28 @@
 from tensorflow import keras
 import requests
 from bs4 import BeautifulSoup as BS
-from model import predict, train_model
+from typing import List
 
 
 def get_html(url: str) -> str:
     """
     get_html(url: str) -> str
 
-    Takes a webpage url and returns its contents as a string
+    :param url: any valid URL
+    :return: the HTML contents of the corresponding webpage, as a string
     """
     # Probably via an extra package, e.g requests
     return requests.get(url).text
 
 
-def get_paragraphs(html_page: str) -> str:
+def get_paragraphs(html_page: str) -> List[str]:
     """
-    get_paragraphs(html_page: str) -> str:
+    get_paragraphs(html_page: str) -> str
 
-    Takes an HTML string and extracts from it a list of the text paragraphs it contains.
+    Strips an HTML webpage of scripts, style amd metadata and returns a list of the  text paragraphs that remain
+
+    :param html_page: a string containing a web page's HTML code
+    :return: A list of the textual paragraphs in the page's main body
     """
     soup = BS(html_page)
     # Irrelevant elements
@@ -88,8 +92,9 @@ def get_recipe_json(url: str) -> str:
     json += "\n\tingredients: ["  # ingredients member, one indentation level
     json += ',\n\t\t'.join(ingredients)  # Ingredient list in the ingredients member, two indentations member
     json += '\n\t]'  # Close off ingredients list (one indentation level)
-    json += '\n\n\tinstructions: "'  # Declare instrcutions member, two indentation levels
-    json += instructions  # Add instructions. Sadly noi way to properly line-wrap and indent this properly, but a compiler would deal
+    json += '\n\n\tinstructions: "'  # Declare instructions member, two indentation levels
+    # Add instructions. Sadly no way to properly line-wrap and indent this properly, but a parser would not care.
+    json += instructions
     json += '"'  # Close instructions quotation
     json += '\n}'  # Closing brace
     return json
