@@ -1,13 +1,14 @@
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+from typing import Tuple, List
 import tensorflow as tf
 import numpy as np
 
-
-
 # -------- Data Parameters --------
+
 DATASET_FILE = 'dataset.tsv'
-TRAINING_SIZE = 60_000
+TRAINING_SIZE = 40_000
+TRAINING_SIZE_NEITHER = 5000
 MODEL_PATH = 'Model'
 # ----------------
 
@@ -48,8 +49,6 @@ MODEL = tf.keras.Sequential([
     tf.keras.layers.Dense(24, activation='selu'),
     tf.keras.layers.Dense(3, activation='softmax')
 ])
-
-
 # ================
 
 # ======== DATA FUNCTIONS ========
@@ -72,7 +71,7 @@ def unpack_tcv(filepath: str) -> Tuple[List[str], List[List[int]]]:
         return raw_data, labels
 
 
-def preprocess_data(raw_data: list) -> np.ndarray:
+def preprocess_data(raw_data: List[str]) -> np.ndarray:
     """
     Does preprocessing for textual training data, passing it through a tokenizer (defined in the "Tokenizing/Embedding
     section at the start of this script), padding it
@@ -106,8 +105,6 @@ def get_data() -> Tuple[Tuple[np.ndarray, np.array], Tuple[np.ndarray, np.array]
     training_data, training_labels = processed_data[:TRAINING_SIZE], processed_labels[:TRAINING_SIZE]
     testing_data, testing_labels = processed_data[TRAINING_SIZE:], processed_labels[TRAINING_SIZE:]
     return (training_data, training_labels), (testing_data, testing_labels)
-
-
 # ================
 
 
@@ -158,14 +155,6 @@ def test_model_new(model: tf.keras.Sequential):
     print([[round(j, 2) for j in i] for i in model.predict(new_data)])
     print('\nEXPECTED:')
     print(new_data_labels)
-
-
-def predict(paragraph: str, load: bool=True) -> float:
-    if load:
-        model = load_model()
-    else:
-        model = MODEL
-    return model.predict(preprocess_data([paragraph]))
 # ================
 
 
