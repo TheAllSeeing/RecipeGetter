@@ -69,8 +69,8 @@ def save_to_tsv(instructions, ingredients, irrelevants):
         dataset.append([item, '0,0,1'])
 
     with open('dataset.tsv', 'w+') as f:
-        for item in dataset.keys():
-            f.write(f"{item}\t{dataset[item]}\n")
+        for item in dataset:
+            f.write(f"{item[0]}\t{item[1]}\n")
 
 
 if __name__ == '__main__':
