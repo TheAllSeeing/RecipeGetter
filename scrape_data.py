@@ -1,9 +1,24 @@
 #!/usr/bin/env python3
 from typing import List, Tuple
-from sys import argv, exit
-
 import requests
-from bs4 import BeautifulSoup as BS
+from bs4 import BeautifulSoup as BS, element
+
+
+def blacklist_filter(line: element.Tag) -> bool:
+    """
+    A predicate used to filter out irrelevant lines often found in ingredient and instructions
+    sections. This will include titles, blank lines and spaces, and all assoetments of HTML/CSS/JS code.
+
+    :param line: a text line found in an WHTML section via bs4
+    :return: True if this line seems relevant, False otherwise.
+    """
+    blacklist_self = ['\n', ' ', '\t', ' ,', 'Ingredients', 'Instructions', 'Method', 'Directions', 'Advertisement']
+    blacklist_parent = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script', 'style', 'img']
+    return str(line) not in blacklist_self and line.parent.name not in blacklist_parent
+
+
+def cleaner_map(line: str) -> str:
+    return line.replace('\n', ' ').replace('\t', ' ')
 
 
 def get_soup(url: str) -> BS:
