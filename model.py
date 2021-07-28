@@ -31,8 +31,8 @@ OOV_TOKEN = "<OOV>"
 # ----------------
 
 # -------- Training Parameters --------
-MAX_EPOCHS = 10
-ACCURACY_THRESHOLD = 0.97
+MAX_EPOCHS = 5
+ACCURACY_THRESHOLD = 0.98
 """If the model passes this threshold in its accuracy on the validation dataset, it is saved and the training ends."""
 CALLBACKS = [ModelSave()]
 # ----------------
@@ -44,6 +44,7 @@ MODEL = tf.keras.Sequential([
     tf.keras.layers.Embedding(VOCABULARY_SIZE, EMBEDDING_DIMENSIONS, input_length=MAX_INPUT_LENGTH),
     tf.keras.layers.GlobalAveragePooling1D(),
     tf.keras.layers.Dense(24, activation='selu'),
+    tf.keras.layers.Dense(32, activation='selu'),
     tf.keras.layers.Dense(32, activation='selu'),
     tf.keras.layers.Dense(24, activation='selu'),
     tf.keras.layers.Dense(3, activation='softmax')
