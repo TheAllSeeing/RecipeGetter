@@ -73,24 +73,30 @@ def lemon_scrape(loveandlemons_url: str) -> Tuple[List[str], List[str], List[str
 
 
 def allrecipe_scrape(allrecipes_url: str) -> Tuple[List[str], List[str], List[str]]:
+
+    all_recipe_filter = lambda line: not line.startswith('Step')
+
     # Get the URL HTML and construct a soup around it
     soup = get_soup(allrecipes_url)
     # Get the needed sectiyyons of the HTML
-    ingredients_section = soup.find_all('ul', {'class': 'ingredients-section'})[0]
-    instructions_section = soup.find_all('ul', {'class': 'instructions-section'})[0]
-    # Construct a soup around them
-    ingredient_soup = BS(str(ingredients_section), features='html.parser')
-    instruction_soup = BS(str(instructions_section), features='html.parser')
+    ingredients_section = soup.find('ul', {'class': 'ingredients-section'})
+    instructions_section = soup.find('ul', {'class': 'instructions-section'})
     # Get their text
-    ingredients_list = ingredient_soup.find_all(text=True)
-    instruction_list = instruction_soup.find_all(text=True)
+    if ingredients_section:
+        ingredients_list = ingredients_section.find_all(text=True)
+    else:
+        ingredients_list = []
+    if instructions_section:
+        instruction_list = instructions_section.find_all(text=True)
+    else:
+        instruction_list = []
     # Filter irrelevants
-    ingredients_list = list(filter(lambda ing: ing not in ['\n', ' ', '\t', ' ,', 'Ingredients'], ingredients_list))
-    instruction_list = list(filter(lambda inst: inst not in ['\n', ' ', '\t', ' ,', 'Instructions'], instruction_list))
+    ingredients_list = list(map(cleaner_map, filter(blacklist_filter, ingredients_list)))
+    instruction_list = list(map(cleaner_map, filter(blacklist_filter, instruction_list)))
     # Throw remaining text on the webpage to irrelevant list
     all_text = soup.find_all(text=True)
     irrelevant_list = [line for line in all_text if line not in instruction_list and line not in ingredients_list]
-    irrelevant_list = list(filter(lambda inst: inst not in ['\n', ' ', 'Instructions'], irrelevant_list))
+    irrelevant_list = list(map(cleaner_map, filter(all_recipe_filter, filter(blacklist_filter, irrelevant_list))))
     # Return results
     return ingredients_list, instruction_list, irrelevant_list
 
