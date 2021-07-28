@@ -28,21 +28,23 @@ def get_soup(url: str) -> BS:
 def simply_scrape(simply_url: str) -> Tuple[List[str], List[str], List[str]]:
     # Get the URL HTML and construct a soup around it
     soup = get_soup(simply_url)
+
+    [s.extract() for s in soup.find_all('figcaption')]
+    [s.extract() for s in soup.find_all(attrs={'class': 'feedback-block'})]
+    [s.extract() for s in soup.find_all(attrs={'class': 'nutrition-info'})]
     # Get the needed sections of the HTML
-    ingredients_section = soup.find_all(id='section--ingredients_1-0')[0]
-    instructions_section = soup.find_all(id='section--instructions_1-0')[0]
-    # Construct a soup around them
-    ingredient_soup = BS(str(ingredients_section), features='html.parser')
-    instruction_soup = BS(str(instructions_section), features='html.parser')
+    ingredients_section = soup.find(id='section--ingredients_1-0')
+    instructions_section = soup.find(id='mntl-sc-block_3-0')
     # Get their text
-    ingredients_list = ingredient_soup.find_all(text=True)
-    instruction_list = instruction_soup.find_all(text=True)
+    ingredients_list = ingredients_section.find_all(text=True)
+    instruction_list = instructions_section.find_all(text=True)
     # Filter irrelevants
-    ingredients_list = list(filter(lambda ing: ing not in ['\n', 'Ingredients'], ingredients_list))
-    instruction_list = list(filter(lambda inst: inst not in ['\n', 'Instructions'], instruction_list))
+    ingredients_list = list(map(cleaner_map, filter(blacklist_filter, ingredients_list)))
+    instruction_list = list(map(cleaner_map, filter(blacklist_filter, instruction_list)))
     # Throw remaining text on the webpage to irrelevant list
-    all_text = soup.find_all(text=True)
+    all_text = get_soup(simply_url).find_all(text=True)
     irrelevant_list = [line for line in all_text if line not in instruction_list and line not in ingredients_list]
+    irrelevant_list = list(map(cleaner_map, filter(blacklist_filter, irrelevant_list)))
     # Return results
     return ingredients_list, instruction_list, irrelevant_list
 
