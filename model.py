@@ -135,6 +135,8 @@ def test_model_manual_dataset(model: tf.keras.Sequential):
         test_data = preprocess_data(test_data)
         print(filename)
         model.evaluate(test_data, test_labels)
+        predictions = model.predict(test_data)
+        print('AVERAGE: ' + str(np.mean(predictions, axis=0)))
 
 
 def test_model_new(model: tf.keras.Sequential):
