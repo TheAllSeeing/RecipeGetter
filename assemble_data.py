@@ -13,8 +13,8 @@ def get_raw_json() -> str:
 
 
 def get_json_dict() -> dict:
-    return json.loads(get_raw_json())
-
+    with open('dataset.json', 'r') as datafile:
+        return eval(datafile.read().replace('null', 'None'))
 
 def get_manual_data() -> Tuple[List[str], List[str], List[str]]:
     instructions = []
