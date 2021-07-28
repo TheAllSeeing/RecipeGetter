@@ -4,7 +4,7 @@ from typing import List, Tuple
 # Prior, Download dataset json from https://eightportions.com/datasets/Recipes/ to dataset.json
 
 JSON_PATH = 'dataset.json'
-DATA_SIZE = 40_000
+DATA_SIZE = 60_000
 
 
 def get_raw_json() -> str:
@@ -30,24 +30,29 @@ def get_manual_data() -> Tuple[List[str], List[str], List[str]]:
 
 
 def get_data_lists() -> Tuple[List[str], List[str], List[str]]:
-    instructions = []
-    ingredients = []
-    irrelevants = []
+    instructions = set()
+    ingredients = set()
+    irrelevants = set()
 
     with open('instructions.txt', 'r') as datafile:
-        instructions += datafile.readlines()
+        instructions = set(datafile.readlines())
     with open('ingredients.txt', 'r') as datafile:
-        ingredients += datafile.readlines()
+        ingredients = set(datafile.readlines())
     with open('neither.txt', 'r') as datafile:
-        irrelevants += datafile.readlines()
+        irrelevants = datafile.readlines()
 
     recipes = get_json_dict()
-    for item in recipes:
+    i = 0
+    while len(instructions) < DATA_SIZE or len(ingredients) < DATA_SIZE:
+        item = recipes[i]
         if item:  # JSON contains a few empty recipes for some reason. this check the item is not empty.
-            instructions += item['directions']
-            ingredients += item['ingredients']
+            if len(instructions) < DATA_SIZE:
+                instructions = instructions.union(item['directions'])
+            if len(ingredients) < DATA_SIZE:
+                ingredients = ingredients.union(item['ingredients'])
+        i += 1
 
-    return list(set(instructions))[:DATA_SIZE], list(set(ingredients))[:DATA_SIZE], irrelevants
+    return list(instructions)[:DATA_SIZE], list(ingredients)[:DATA_SIZE], list(irrelevants)[:DATA_SIZE]
 
 
 def save_to_tsv(instructions, ingredients, irrelevants):
@@ -62,11 +67,7 @@ def save_to_tsv(instructions, ingredients, irrelevants):
     for i in range(DATA_SIZE):
         dataset.append([ingredients[i], '1,0,0'])
         dataset.append([instructions[i], '0,1,0'])
-
-    for item in irrelevants[:20_000]:
-        dataset.insert(0, [item, '0,0,1'])
-    for item in irrelevants[20_000:]:
-        dataset.append([item, '0,0,1'])
+        # dataset.append([irrelevants[i], '0,0,1'])
 
     with open('dataset.tsv', 'w+') as f:
         for item in dataset:
