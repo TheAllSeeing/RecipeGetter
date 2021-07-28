@@ -115,17 +115,18 @@ def get_scraper(site_name: str) -> callable:
 
 def save(site: str, urls: List[str]):
     scraper = get_scraper(site)
+    filenames = ['ingredients.txt', 'instructions.txt', 'neither.txt']
 
     if scraper is None:
         return
-    for url in urls:
-        ingredients, instructions, irrelevants = scraper(url)
-        with open('ingredients.txt', 'a') as ingredients_file:
-            for line in ingredients:
-                ingredients_file.write(line)
-        with open('instructions.txt', 'a') as instructions_file:
-            for line in instructions:
-                instructions_file.write(line)
+    for i, url in enumerate(urls, 1):
+        print(str(i) + '/' + str(len(urls)))
+        # Iterates over [ingredients, instructions, neither]
+        for lst, filename in zip(scraper(url), filenames):
+            with open(filename, 'a') as datafile:
+                for line in lst:
+                    datafile.write(line + '\n')
+
         with open('neither.txt', 'a') as neither_file:
             for line in irrelevants:
                 neither_file.write(line)
