@@ -1,5 +1,4 @@
-import json
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 # Prior, Download dataset json from https://eightportions.com/datasets/Recipes/ to dataset.json
 
@@ -12,7 +11,7 @@ def get_raw_json() -> str:
         return datafile.read()
 
 
-def get_json_dict() -> dict:
+def get_json_dict() -> Dict[str, List[str]]:
     with open('dataset.json', 'r') as datafile:
         return eval(datafile.read().replace('null', 'None'))
 
