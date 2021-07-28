@@ -7,8 +7,7 @@ import numpy as np
 # -------- Data Parameters --------
 
 DATASET_FILE = 'dataset.tsv'
-TRAINING_SIZE = 40_000
-TRAINING_SIZE_NEITHER = 5000
+TRAINING_SIZE = 100_000
 MODEL_PATH = 'Model'
 # ----------------
 
