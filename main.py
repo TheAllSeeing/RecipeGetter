@@ -33,14 +33,10 @@ def get_paragraphs(html_page: str) -> List[str]:
     """
     soup = BS(html_page, features='html.parser')
     # Irrelevant elements
-    blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script', 'style']
-    base_text = soup.find('main').find_all(text=True)
-    if not base_text:
-        base_text = soup.find_all(text=True)
-    filtered_lines = [str(line) for line in base_text if line.parent.name not in blacklist]
-    trimmed = [p for p in filtered_lines if
-               p not in ['\n', ' ', '']]  # Trim empty space when there were multiple newlines in a row.
-    return trimmed
+    main_soup = soup.find('main')
+    if main_soup:  # If main tag exists
+        soup = main_soup
+    return clean_paragraphs(soup.find_all(text=True))
 
 
 def classify(paragraphs: List[str]) -> List[int]:
