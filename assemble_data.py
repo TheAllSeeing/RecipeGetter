@@ -28,7 +28,7 @@ def get_manual_data() -> Tuple[List[str], List[str], List[str]]:
     return instructions, ingredients, neither
 
 
-def get_data_lists() -> Tuple[List[str], List[str], List[str]]:
+def get_data_lists() -> Tuple[List[str], List[str]]:
     instructions = set()
     ingredients = set()
     irrelevants = set()
@@ -37,8 +37,6 @@ def get_data_lists() -> Tuple[List[str], List[str], List[str]]:
         instructions = set(datafile.readlines())
     with open('ingredients.txt', 'r') as datafile:
         ingredients = set(datafile.readlines())
-    with open('neither.txt', 'r') as datafile:
-        irrelevants = datafile.readlines()
 
     recipes = get_json_dict()
     i = 0
@@ -51,22 +49,20 @@ def get_data_lists() -> Tuple[List[str], List[str], List[str]]:
                 ingredients = ingredients.union(item['ingredients'])
         i += 1
 
-    return list(instructions)[:DATA_SIZE], list(ingredients)[:DATA_SIZE], list(irrelevants)[:DATA_SIZE]
+    return list(instructions)[:DATA_SIZE], list(ingredients)[:DATA_SIZE]
 
 
-def save_to_tsv(instructions, ingredients, irrelevants):
+def save_to_tsv(instructions, ingredients):
     dataset = []
 
     # Ignore tabs and newlines to not interrupt the tsv format (the tokenizer does not care about them anyway)
     clean = lambda lst: [str(item).replace('\t', ' ').replace('\n', ' ') for item in lst]
     ingredients = clean(ingredients)
     instructions = clean(instructions)
-    irrelevants = clean(irrelevants)
 
     for i in range(DATA_SIZE):
-        dataset.append([ingredients[i], '1,0,0'])
-        dataset.append([instructions[i], '0,1,0'])
-        # dataset.append([irrelevants[i], '0,0,1'])
+        dataset.append([ingredients[i], '1,0'])
+        dataset.append([instructions[i], '0,1'])
 
     with open('dataset.tsv', 'w+') as f:
         for item in dataset:

@@ -1,16 +1,14 @@
 import requests
+import classifier
+import nlp_utils as utils
+import trashbot
 from bs4 import BeautifulSoup as BS
 from typing import List
+from nlp_utils import clean_paragraphs
 
-from model import load_model, preprocess_data
-
-CONFIDENCE_THRESHOLD = 0.97
-"""Minimum model confidence in classification required for a paragraph to go into the threshold. 
-
-    It is assumed the model will be at least a little insecure about irrelevant texts (e.g 'Contact Us')
-"""
-
-MODEL = load_model()
+CONFIDENCE_THRESHOLD_TRASH = 0.8
+CONFIDENCE_THRESHOLD_INGREDIENT = 0.9
+CONFIDENCE_THRESHOLD_INSTRUCTION = 0.68
 
 
 def get_html(url: str) -> str:
@@ -48,18 +46,27 @@ def get_paragraphs(html_page: str) -> List[str]:
 def classify(paragraphs: List[str]) -> List[int]:
     """
     :param paragraphs: a paragraph from a recipe page
-    :return: integer classification of the paragraph as instruction (1), ingredient (0) or neither (-1)
+    :return: integer classification of the paragraph as ingredient (0), instruction (1) or neither (2)
     """
-    predictions = MODEL.predict(preprocess_data(paragraphs))
+    classifications = classifier.predict(paragraphs)
+    trash_guesses = trashbot.predict(paragraphs)
 
-    def prediction_to_code(prediction):
-        if prediction[0] > CONFIDENCE_THRESHOLD:
-            return 0
-        if prediction[1] > CONFIDENCE_THRESHOLD:
-            return 1
-        return -1
+    results = []
 
-    return [prediction_to_code(prediction) for prediction in predictions]
+    for classification, trash_guess, paragraph in zip(classifications, trash_guesses, paragraphs):
+
+        # Model Classifications
+        if trash_guess > CONFIDENCE_THRESHOLD_TRASH:
+            results.append(2)
+        elif classification[1] > CONFIDENCE_THRESHOLD_INSTRUCTION:
+            results.append(1)
+        elif classification[0] > CONFIDENCE_THRESHOLD_INGREDIENT:
+            results.append(0)
+        # Default Class
+        else:
+            results.append(2)
+
+    return results
 
 
 def get_recipe_json(url: str) -> str:
