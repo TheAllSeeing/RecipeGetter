@@ -111,7 +111,7 @@ def get_recipe_json(url: str) -> str:
         # get paragraph type - 1 if it's an ingredient, 0 if it's an instruction and -1 if it is neither
 
         # Add to appropriate variable or ignore if irrelevant
-        if paragraph_type == -1:
+        if paragraph_type == 2:
             continue
         elif paragraph_type == 1:
             instructions += '\n' + paragraph
