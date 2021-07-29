@@ -59,13 +59,17 @@ def unpack_tsv(filepath: str) -> Tuple[List[str], List[List[int]]]:
     """
     raw_data = []
     labels = []
-    with open(filepath) as tsvfile:
+    with open(filepath) as tsvfile, open('datafiles/neither.txt') as neitherfile:
         for i, item in enumerate(tsvfile.readlines()):
             cells = item.split('\t')
             raw_data.append(cells[0])
             label = cells[1].split(',')
             label = [int(i) for i in label]
             labels.append(label)
+
+            if i % 2 == 0:
+                raw_data.append(neitherfile.readline())
+                labels.append([0, 0])
 
         return raw_data, labels
 

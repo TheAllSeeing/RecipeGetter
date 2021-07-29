@@ -2,7 +2,7 @@ from typing import List, Tuple, Dict
 
 # Prior, Download dataset json from https://eightportions.com/datasets/Recipes/ to dataset.json
 
-JSON_PATH = 'dataset.json'
+JSON_PATH = 'datafiles/dataset.json'
 DATA_SIZE = 60_000
 
 
@@ -12,20 +12,17 @@ def get_raw_json() -> str:
 
 
 def get_json_dict() -> Dict[str, List[str]]:
-    with open('dataset.json', 'r') as datafile:
+    with open('datafiles/dataset.json', 'r') as datafile:
         return eval(datafile.read().replace('null', 'None'))
 
-def get_manual_data() -> Tuple[List[str], List[str], List[str]]:
+def get_manual_data() -> Tuple[List[str], List[str]]:
     instructions = []
     ingredients = []
-    neither = []
-    with open('instructions.txt', 'r') as datafile:
+    with open('datafiles/instructions.txt', 'r') as datafile:
         instructions += datafile.readlines()
-    with open('ingredients.txt', 'r') as datafile:
+    with open('datafiles/ingredients.txt', 'r') as datafile:
         ingredients += datafile.readlines()
-    with open('neither.txt', 'r') as datafile:
-        neither += datafile.readlines()
-    return instructions, ingredients, neither
+    return instructions, ingredients
 
 
 def get_data_lists() -> Tuple[List[str], List[str]]:
@@ -33,9 +30,9 @@ def get_data_lists() -> Tuple[List[str], List[str]]:
     ingredients = set()
     irrelevants = set()
 
-    with open('instructions.txt', 'r') as datafile:
+    with open('datafiles/instructions.txt', 'r') as datafile:
         instructions = set(datafile.readlines())
-    with open('ingredients.txt', 'r') as datafile:
+    with open('datafiles/ingredients.txt', 'r') as datafile:
         ingredients = set(datafile.readlines())
 
     recipes = get_json_dict()
@@ -64,9 +61,10 @@ def save_to_tsv(instructions, ingredients):
         dataset.append([ingredients[i], '1,0'])
         dataset.append([instructions[i], '0,1'])
 
-    with open('dataset.tsv', 'w+') as f:
-        for item in dataset:
+    with open('datafiles/dataset.tsv', 'w+') as f:
+        for i, item in enumerate(dataset, 1):
             f.write(f"{item[0]}\t{item[1]}\n")
+            print(f'{i}/{len(dataset)}')
 
 
 if __name__ == '__main__':
