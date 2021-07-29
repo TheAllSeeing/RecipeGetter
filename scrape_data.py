@@ -122,6 +122,8 @@ def get_scraper(site_name: str) -> callable:
         return lemon_scrape
     elif site_name == 'allrecipe':
         return allrecipe_scrape
+    elif site_name == 'network':
+        return network_scrape
     else:
         print("Unrecognized site: " + site_name)
         return None
