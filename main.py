@@ -49,6 +49,11 @@ def classify(paragraphs: List[str]) -> List[int]:
 
     for classification, paragraph in zip(classifications, paragraphs):
 
+        # Common Phrases
+        if paragraph.startswith('Step ') and len(paragraph) == 6:
+            results.append(1)
+        elif paragraph.startswith('(function() {'):
+            results.append(2)
         # Model Classifications
         elif classification[1] > CONFIDENCE_THRESHOLD_INSTRUCTION:
             results.append(1)
