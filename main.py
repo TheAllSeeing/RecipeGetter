@@ -1,7 +1,6 @@
 import requests
 import classifier
 import nlp_utils as utils
-import trashbot
 from bs4 import BeautifulSoup as BS
 from typing import List
 from nlp_utils import clean_paragraphs
@@ -45,11 +44,10 @@ def classify(paragraphs: List[str]) -> List[int]:
     :return: integer classification of the paragraph as ingredient (0), instruction (1) or neither (2)
     """
     classifications = classifier.predict(paragraphs)
-    trash_guesses = trashbot.predict(paragraphs)
 
     results = []
 
-    for classification, trash_guess, paragraph in zip(classifications, trash_guesses, paragraphs):
+    for classification, paragraph in zip(classifications, paragraphs):
 
         # Model Classifications
         elif classification[1] > CONFIDENCE_THRESHOLD_INSTRUCTION:
