@@ -2,23 +2,7 @@
 from typing import List, Tuple
 import requests
 from bs4 import BeautifulSoup as BS, element
-
-
-def blacklist_filter(line: element.Tag) -> bool:
-    """
-    A predicate used to filter out irrelevant lines often found in ingredient and instructions
-    sections. This will include titles, blank lines and spaces, and all assoetments of HTML/CSS/JS code.
-
-    :param line: a text line found in an WHTML section via bs4
-    :return: True if this line seems relevant, False otherwise.
-    """
-    blacklist_self = ['\n', ' ', '\t', ' ,', 'Ingredients', 'Instructions', 'Method', 'Directions', 'Advertisement']
-    blacklist_parent = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script', 'style', 'img']
-    return str(line) not in blacklist_self and line.parent.name not in blacklist_parent
-
-
-def cleaner_map(line: str) -> str:
-    return line.replace('\n', ' ').replace('\t', ' ')
+from nlp_utils import DATAFILES, clean_paragraphs
 
 
 def get_soup(url: str) -> BS:
@@ -35,16 +19,22 @@ def simply_scrape(simply_url: str) -> Tuple[List[str], List[str], List[str]]:
     # Get the needed sections of the HTML
     ingredients_section = soup.find(id='section--ingredients_1-0')
     instructions_section = soup.find(id='mntl-sc-block_3-0')
+
+    # If the page didn't fit the template and bs4 could not locate such sections, exit and return empty lists.
+    if not ingredients_section or not instructions_section:
+        print(simply_url)
+        return [], [], []
+
     # Get their text
     ingredients_list = ingredients_section.find_all(text=True)
     instruction_list = instructions_section.find_all(text=True)
     # Filter irrelevants
-    ingredients_list = list(map(cleaner_map, filter(blacklist_filter, ingredients_list)))
-    instruction_list = list(map(cleaner_map, filter(blacklist_filter, instruction_list)))
+    ingredients_list = clean_paragraphs(ingredients_list)
+    instruction_list = clean_paragraphs(instruction_list)
     # Throw remaining text on the webpage to irrelevant list
     all_text = get_soup(simply_url).find_all(text=True)
     irrelevant_list = [line for line in all_text if line not in instruction_list and line not in ingredients_list]
-    irrelevant_list = list(map(cleaner_map, filter(blacklist_filter, irrelevant_list)))
+    irrelevant_list = clean_paragraphs(irrelevant_list)
     # Return results
     return ingredients_list, instruction_list, irrelevant_list
 
@@ -55,48 +45,72 @@ def lemon_scrape(loveandlemons_url: str) -> Tuple[List[str], List[str], List[str
     # Get the needed sectiyyons of the HTML
     ingredients_section = soup.find('div', {'class': 'wprm-recipe-ingredients-container'})
     instructions_section = soup.find('div', {'class': 'wprm-recipe-instructions-container'})
+
+    # If the page didn't fit the template and bs4 could not locate such sections, exit and return empty lists.
     if not ingredients_section or not instructions_section:
         print(loveandlemons_url)
         return [], [], []
+
     # Get their text
     ingredients_list = ingredients_section.find_all(text=True)
     instruction_list = instructions_section.find_all(text=True)
     # Filter irrelevants
-    ingredients_list = list(map(cleaner_map, filter(blacklist_filter, ingredients_list)))
-    instruction_list = list(map(cleaner_map, filter(blacklist_filter, instruction_list)))
+    ingredients_list = clean_paragraphs(ingredients_list)
+    instruction_list = clean_paragraphs(instruction_list)
     # Throw remaining text on the webpage to irrelevant list
     all_text = soup.find_all(text=True)
     irrelevant_list = [line for line in all_text if line not in instruction_list and line not in ingredients_list]
-    irrelevant_list = list(map(cleaner_map, filter(blacklist_filter, irrelevant_list)))
+    irrelevant_list = clean_paragraphs(irrelevant_list)
     # Return results
     return ingredients_list, instruction_list, irrelevant_list
 
 
 def allrecipe_scrape(allrecipes_url: str) -> Tuple[List[str], List[str], List[str]]:
 
-    all_recipe_filter = lambda line: not line.startswith('Step')
-
     # Get the URL HTML and construct a soup around it
     soup = get_soup(allrecipes_url)
     # Get the needed sectiyyons of the HTML
     ingredients_section = soup.find('ul', {'class': 'ingredients-section'})
     instructions_section = soup.find('ul', {'class': 'instructions-section'})
+
+    # If the page didn't fit the template and bs4 could not locate such sections, exit and return empty lists.
+    if not ingredients_section or not instructions_section:
+        print(allrecipes_url)
+        return [], [], []
+
     # Get their text
-    if ingredients_section:
-        ingredients_list = ingredients_section.find_all(text=True)
-    else:
-        ingredients_list = []
-    if instructions_section:
-        instruction_list = instructions_section.find_all(text=True)
-    else:
-        instruction_list = []
+    ingredients_list = ingredients_section.find_all(text=True)
+    instruction_list = instructions_section.find_all(text=True)
     # Filter irrelevants
-    ingredients_list = list(map(cleaner_map, filter(blacklist_filter, ingredients_list)))
-    instruction_list = list(map(cleaner_map, filter(blacklist_filter, instruction_list)))
+    ingredients_list = clean_paragraphs(ingredients_list)
+    instruction_list = clean_paragraphs(instruction_list)
     # Throw remaining text on the webpage to irrelevant list
     all_text = soup.find_all(text=True)
     irrelevant_list = [line for line in all_text if line not in instruction_list and line not in ingredients_list]
-    irrelevant_list = list(map(cleaner_map, filter(all_recipe_filter, filter(blacklist_filter, irrelevant_list))))
+    irrelevant_list = clean_paragraphs(irrelevant_list)
+    # Return results
+    return ingredients_list, instruction_list, irrelevant_list
+
+def network_scrape(foodnetwork_url: str) -> Tuple[List[str], List[str], List[str]]:
+    soup = get_soup(foodnetwork_url)
+    ingredients_section = soup.find('div', {'class': 'o-Ingredients__m-Body'})
+    instructions_section = soup.find('div', {'class': 'o-Method__m-Body'})
+
+    # If the page didn't fit the template and bs4 could not locate such sections, exit and return empty lists.
+    if not ingredients_section or not instructions_section:
+        print(foodnetwork_url)
+        return [], [], []
+
+    # Get their text
+    ingredients_list = ingredients_section.find_all(text=True)
+    instruction_list = instructions_section.find_all(text=True)
+    # Filter irrelevants
+    ingredients_list = clean_paragraphs(ingredients_list)
+    instruction_list = clean_paragraphs(instruction_list)
+    # Throw remaining text on the webpage to irrelevant list
+    all_text = soup.find_all(text=True)
+    irrelevant_list = [line for line in all_text if line not in instruction_list and line not in ingredients_list]
+    irrelevant_list = clean_paragraphs(irrelevant_list)
     # Return results
     return ingredients_list, instruction_list, irrelevant_list
 
