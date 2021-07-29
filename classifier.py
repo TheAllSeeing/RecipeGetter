@@ -9,7 +9,7 @@ from nlp_utils import ModelSaver
 
 # -------- Data Parameters --------
 DATASET_FILE = 'datafiles/dataset.tsv'
-TRAINING_SIZE = 100_000
+TRAINING_SIZE = 160_000
 MODEL_PATH = 'savefiles/Classifier'
 TOKENIZER_PATH = 'savefiles/classifier_tokenizer.json'
 # ----------------

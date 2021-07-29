@@ -56,8 +56,6 @@ def classify(paragraphs: List[str]) -> List[int]:
     for classification, trash_guess, paragraph in zip(classifications, trash_guesses, paragraphs):
 
         # Model Classifications
-        if trash_guess > CONFIDENCE_THRESHOLD_TRASH:
-            results.append(2)
         elif classification[1] > CONFIDENCE_THRESHOLD_INSTRUCTION:
             results.append(1)
         elif classification[0] > CONFIDENCE_THRESHOLD_INGREDIENT:
