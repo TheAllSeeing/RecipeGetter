@@ -2,5 +2,3 @@
 __pycache__/
 
 .idea/
-
-datafiles/dataset.tsv
