@@ -1,13 +1,14 @@
 import requests
 import classifier
-import nlp_utils as utils
+import utils as utils
 from bs4 import BeautifulSoup as BS
 from typing import List
-from nlp_utils import clean_paragraphs
+from utils import clean_paragraphs
 
-CONFIDENCE_THRESHOLD_TRASH = 0.8
 CONFIDENCE_THRESHOLD_INGREDIENT = 0.9
+"""Minimum model confidence in ingredient classification to go into JSON"""
 CONFIDENCE_THRESHOLD_INSTRUCTION = 0.68
+"""Minimum model confidence in instruction classification to go into JSON"""
 
 
 def get_html(url: str) -> str:
@@ -35,6 +36,8 @@ def get_paragraphs(html_page: str) -> List[str]:
     main_soup = soup.find('main')
     if main_soup:  # If main tag exists
         soup = main_soup
+    for span in soup.find_all('span'):
+        span.replace_with_children()
     return clean_paragraphs(soup.find_all(text=True))
 
 
@@ -113,7 +116,8 @@ def get_recipe_json(url: str) -> str:
         if paragraph_type == 2:
             continue
         elif paragraph_type == 1:
-            instructions += '\n' + paragraph
+
+            instructions += '\n\n' + paragraph
         elif paragraph_type == 0:
             ingredients.append(paragraph)
 
@@ -131,4 +135,6 @@ def get_recipe_json(url: str) -> str:
 
 
 if __name__ == '__main__':
-    print(get_recipe_json('https://www.loveandlemons.com/homemade-pasta-recipe/'))
+    TEST_URL = 'https://www.allrecipes.com/recipe/204952/san-diego-grilled-chicken/'
+    print(get_recipe_json('https://www.seriouseats.com/fresh-egg-pasta'))
+    get_paragraphs(get_html('https://www.bettycrocker.com/recipes/lemon-lime-checkerboard-cake/9ba32e15-746f-485d-a41a-3a66d3c8557b'))

@@ -6,6 +6,7 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 DATAFILES = ['datafiles/' + filename for filename in ['ingredients.txt', 'instructions.txt', 'neither.txt']]
+OOV_TOKEN = '<OOV>'
 
 
 class ModelSaver(tf.keras.callbacks.Callback):
@@ -22,9 +23,12 @@ class ModelSaver(tf.keras.callbacks.Callback):
             self.model.stop_training = True
 
 
-def save_tokenizer(tokenizer, filepath):
-    with open(filepath, 'w+') as tokenizer_file:
+def generate_tokenizer(voc_size: int, texts_to_fit: List[str], save_path: str) -> Tokenizer:
+    tokenizer = Tokenizer(num_words=voc_size, oov_token=OOV_TOKEN)
+    tokenizer.fit_on_texts(texts_to_fit)
+    with open(save_path, 'w+') as tokenizer_file:
         tokenizer_file.write(tokenizer.to_json())
+    return tokenizer
 
 
 def load_tokenizer(filepath) -> tf.keras.preprocessing.text.Tokenizer:
@@ -32,19 +36,7 @@ def load_tokenizer(filepath) -> tf.keras.preprocessing.text.Tokenizer:
         return tf.keras.preprocessing.text.tokenizer_from_json(tokenizer_file.read())
 
 
-def test_on_scraped(model: tf.keras.Sequential, labels: List[List[int]], tokenizer: Tokenizer, max_input_length: int):
-    for filename, label in zip(DATAFILES, labels):
-        with open(filename, 'r') as datafile:
-            test_data = datafile.readlines()
-        test_labels = np.array([label for _ in test_data])
-        test_data = preprocess_data(test_data, tokenizer, max_input_length)
-        print(filename)
-        model.evaluate(test_data, test_labels)
-        predictions = model.predict(test_data)
-        print('AVERAGE: ' + str(np.mean(predictions, axis=0)))
-
-
-def preprocess_data(raw_data: List[str], tokenizer: Tokenizer, max_length: int) -> np.ndarray:
+def preprocess_text(raw_data: List[str], tokenizer: Tokenizer, max_length: int) -> np.ndarray:
     """
     Does preprocessing for textual training data, passing it through a tokenizer (defined in the "Tokenizing/Embedding
     section at the start of this script), padding it
@@ -89,4 +81,5 @@ def _cleaner_map(line: str) -> str:
 
 def clean_paragraphs(paragraphs: Any) -> List[str]:
     return list(map(_cleaner_map, filter(_blacklist_filter, paragraphs)))
+
 
