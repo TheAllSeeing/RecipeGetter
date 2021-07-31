@@ -7,6 +7,5 @@ python3 -c "from main import get_recipe_json; print(get_recipe_json('$1'))" 2>"$
 # shellcheck disable=SC2181
 if [ "$?" -ne 0 ]; then
   echo "An error occurred. Check $err_file for details."
-  cat "$err_file"
 fi
 

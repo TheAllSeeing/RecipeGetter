@@ -1,7 +1,6 @@
 import requests
 import classifier
-import utils as utils
-from bs4 import BeautifulSoup as BS
+from bs4 import BeautifulSoup
 from typing import List
 from utils import clean_paragraphs
 
@@ -31,7 +30,7 @@ def get_paragraphs(html_page: str) -> List[str]:
     :param html_page: a string containing a web page's HTML code
     :return: A list of the textual paragraphs in the page's main body
     """
-    soup = BS(html_page, features='html.parser')
+    soup = BeautifulSoup(html_page, features='html.parser')
     # Irrelevant elements
     main_soup = soup.find('main')
     if main_soup:  # If main tag exists

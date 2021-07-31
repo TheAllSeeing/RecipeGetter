@@ -4,7 +4,6 @@ err_file=$(mktemp)
 python3 -c "from scrape_data import reset; reset()" 2>"$err_file"  \
 && python3 ./assemble_data.py 2>"$err_file" \
 && python3 ./classifier.py 2>"$err_file" \
-&& python3 ./trashbot.py 2>"$err_file"
 
 # Suppress warning to use command in if block directly rather than checking status later. I think it's more mess
 # than it's worth.
