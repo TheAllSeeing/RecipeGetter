@@ -38,7 +38,7 @@ def get_manual_data() -> Tuple[List[str], List[str]]:
     """
     with open('datafiles/ingredients.txt') as ingredient_file, \
             open('datafiles/instructions.txt', 'r') as instruction_file:
-        return ingredient_file.readlines(), instruction_file.readlines()
+        return list(set(ingredient_file.readlines())), list(set(instruction_file.readlines()))
 
 
 def get_data_lists() -> Tuple[List[str], List[str]]:

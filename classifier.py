@@ -39,7 +39,7 @@ OOV_TOKEN = "<OOV>"
 # -------- Training Parameters --------
 MAX_EPOCHS = 5
 """Maximum amount of epochs to run the model training for."""
-ACCURACY_THRESHOLD = 0.99
+ACCURACY_THRESHOLD = 0.97
 """If the model passes this threshold in its accuracy on the validation dataset, it is saved and the training ends."""
 CALLBACKS = [ModelSaver(ACCURACY_THRESHOLD, MODEL_PATH)]
 """Callback functions to run at the end of each input (objects must inherit from"""
